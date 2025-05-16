@@ -31,15 +31,43 @@ export const createBlog = async (req, res) => {
 
     res.status(201).json({ success: true, data: blog });
   } catch (error) {
-    
+
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Get all blogs with populated author info
+// Get all blogs with filtering and pagination
 export const getBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find().populate('author', 'name email').exec();
+    const { category, author, page = 1, limit = 6 } = req.query;
+
+    // Validate page and limit
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    if (isNaN(pageNumber) || pageNumber < 1) {
+      return res.status(400).json({ success: false, message: 'Invalid page number' });
+    }
+    if (isNaN(limitNumber) || limitNumber < 1) {
+      return res.status(400).json({ success: false, message: 'Invalid limit' });
+    }
+
+    // Build the query
+    let query = {};
+    if (category) {
+      query.category = category;
+    }
+    if (author) {
+      query.author = author;
+    }
+
+    // Fetch blogs with pagination and populate author
+    const blogs = await Blog.find(query)
+      .populate('author', 'name email')
+      .skip((pageNumber - 1) * limitNumber)
+      .limit(limitNumber)
+      .sort({ createdAt: -1 }) // Latest blogs first
+      .exec();
+
     res.status(200).json({ success: true, data: blogs });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
