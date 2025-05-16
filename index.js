@@ -19,7 +19,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
-  "https://billing-software-six.vercel.app"
+  "https://blog-app-peach-xi.vercel.app"
 ];
 
 app.use((req, res, next) => {
