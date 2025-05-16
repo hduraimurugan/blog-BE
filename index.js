@@ -7,18 +7,14 @@ import path from "path";
 import http from "http";
 import chalk from "chalk";
 import authRoutes from "./routes/auth.routes.js"
+import blogRoutes from "./routes/blog.routes.js"
 
-// Load environment variables
 dotenv.config();
 
-// Create Express app and server
 const app = express();
 const server = http.createServer(app);
-
-// Start time for performance tracking
 const appStartTime = process.hrtime();
 
-// Allowed client origins
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
@@ -26,7 +22,6 @@ const allowedOrigins = [
   "https://billing-software-six.vercel.app"
 ];
 
-// CORS middleware (manual handling)
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
@@ -43,16 +38,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware setup
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Static assets
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "public")));
 
-// Serve HTML documentation
 app.get("/", (req, res) => {
   const documentationPath = path.join(__dirname, "public", "documentation.html");
   res.sendFile(documentationPath, (err) => {
@@ -63,17 +55,16 @@ app.get("/", (req, res) => {
   });
 });
 
-// Example route integration (uncomment when ready)
-app.use("/api/auth", authRoutes);
 
-// Helper to format elapsed startup time
+app.use("/api/auth", authRoutes);
+app.use("/api/blog", blogRoutes);
+
 function formatElapsedTime(start) {
   const [seconds, nanoseconds] = process.hrtime(start);
   const milliseconds = (seconds * 1000 + nanoseconds / 1e6).toFixed(2);
   return `${milliseconds} ms`;
 }
 
-// Connect to MongoDB and start server
 const PORT = process.env.PORT || 1616;
 connectDB()
   .then(() => {
