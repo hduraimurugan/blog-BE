@@ -39,7 +39,7 @@ export const createBlog = async (req, res) => {
 // Get all blogs with filtering and pagination
 export const getBlogs = async (req, res) => {
   try {
-    const { category, author, page = 1, limit = 6 } = req.query;
+    const { search, category, author, page = 1, limit = 6 } = req.query;
 
     // Validate page and limit
     const pageNumber = parseInt(page, 10);
